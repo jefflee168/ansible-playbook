@@ -1,12 +1,12 @@
 #################### 部署nginx ####################
 - name: 判断 nginx 用户是否存在
   shell: >
-    grep nginx /etc/passwd
+    grep nginx /etc/passwd && echo $?
   register: nginx_user_exists
 
 - name: 第一步：创建 nginx 用户
   command: adduser {{ nginx_user }} -s /sbin/nologin
-  when: '"nginx" not in nginx_user_exists.stdout'
+  when: '"1" in nginx_user_exists.stdout'
 
 - name: 第二步：复制 nginx 安装
   synchronize:
