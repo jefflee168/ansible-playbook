@@ -1,5 +1,5 @@
 # 此文件用于定义全局变量，其它文件可以引用以下所有变量
 # 引用方法如：dest={{ jdk_root_dir }}
----
-jdk_root_dir: jdk1.8.0_251
-dest_dir: /usr/local
+#---
+#jdk_root_dir: jdk1.8.0_251
+#dest_dir: /usr/local
