@@ -1,3 +1,4 @@
-#roles/jdk/files/*
+roles/jdk/files/*
+roles/nginx/files/*
 
 update_content.txt

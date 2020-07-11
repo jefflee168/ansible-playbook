@@ -1,0 +1,20 @@
+#################### 安装常用的工具 ####################
+- name: 第一步：yum 安装常用的工具
+  yum:
+    name:
+    - gcc
+    - pcre
+    - pcre-devel
+    - openssl
+    - openssl-devel
+    - iftop
+    - zip
+    - unzip
+    - gzip
+    - sysstat
+    - iotop
+    - net-tools
+    - telnet
+    - wget
+
+#- name: 第二步：创建 jdk 的软链接

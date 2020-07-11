@@ -9,6 +9,7 @@
     path: "{{ dest_dir }}/jdk"
     state: link
     src: "{{ dest_dir }}/{{ jdk_root_dir }}"
+    mode: 0755
     owner: root
     group: root
 
@@ -16,6 +17,6 @@
   lineinfile:
     path: /etc/profile
     line:
-      JAVA_HOME={{ dest_dir }}/jdk
+      export JAVA_HOME={{ dest_dir }}/jdk
       export PATH=${JAVA_HOME}/bin:$PATH
 ################### End 配置java环境 ####################

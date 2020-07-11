@@ -1,11 +1,12 @@
-# 部署 jdk：部署前请先下载 jdk 包解压后放到目录 roles/jdk/files 下
-# 并修改 roles/jdk/vars/main.yml 中的 jdk 对应目录
+# 部署 nginx：部署前请先下载 nginx 包解压后放到目录 roles/nginx/files 下
+# 并修改 roles/nginx/vars/main.yml 中的 nginx 对应目录
 
-- hosts: all
+- hosts: webservers
   gather_facts: false # 不检测系统信息，有利于加快访问
   serial: 5           # 并发执行，即一次可同时执行 5 个节点，可按实现节点数更改
   become: yes
   become_user: root   # 提权为 root 用户
 
   roles:
-  - jdk
+  - common
+  - nginx

@@ -1,0 +1,51 @@
+#################### 部署nginx ####################
+- name: 第一步：创建 nginx 用户
+  command: adduser {{ nginx_user }} -s /sbin/nologin
+
+- name: 第二步：复制 nginx 安装
+  synchronize:
+    src: files/{{ nginx_package }}
+    dest: /opt
+
+- name: 第三步：解压 nginx
+  unarchive:
+    src: "/opt/{{ nginx_package }}"
+    dest: /opt    
+
+- name: 第四步：configure nginx
+  command: ./configure --user={{ nginx_user }} --group={{ nginx_group }} --prefix={{ nginx_root_dir }} {{ nginx_modules }}
+  args:
+    chdir: /opt/{{ nginx_dir }}
+
+- name: 第五步：make nginx
+  command: make
+  args:
+    chdir: /opt/{{ nginx_dir }}
+
+- name: 第六步：make install nginx
+  command: make install
+  args:
+    chdir: /opt/{{ nginx_dir }}
+
+#- name: 第七步：复制配置文件
+#  synchronize:
+#    src: templates/nginx.conf.j2
+#    dest: {{ nginx_root_dir }}/conf/nginx.conf
+#    owner: nginx
+#    group: nginx
+
+- name: 第八步：启动 nginx
+  command: "{{ nginx_root_dir }}/sbin/nginx -t"
+
+- name: 第九步：添加开机启动
+  lineinfile:
+    path: /etc/rc.d/rc.local
+    line:
+      "{{ nginx_root_dir }}/sbin/nginx -t"
+  
+- name: 第十步：添加变量环境
+  lineinfile:
+    path: /etc/profile
+    line:
+      export NGINX_HOME={{ nginx_root_dir }}
+      export PATH=${NGINX_HOME}/sbin:$PATH
