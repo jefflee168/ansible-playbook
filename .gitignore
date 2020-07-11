@@ -1,3 +1,3 @@
-jdk/roles/jdk/files/*
+roles/jdk/files/*
 
 update_content.txt
