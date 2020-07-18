@@ -1,7 +1,7 @@
 # 部署 nginx：部署前请先下载 nginx 包解压后放到目录 roles/nginx/files 下
 # 并修改 roles/nginx/vars/main.yml 中的 nginx 对应目录
 
-- hosts: webservers
+- hosts: test
   gather_facts: false # 不检测系统信息，有利于加快访问
   serial: 5           # 并发执行，即一次可同时执行 5 个节点，可按实现节点数更改
   become: yes

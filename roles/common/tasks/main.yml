@@ -16,5 +16,6 @@
     - net-tools
     - telnet
     - wget
+    - rsync
 
 #- name: 第二步：创建 jdk 的软链接

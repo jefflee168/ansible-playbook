@@ -1,4 +1,4 @@
-- hosts: all
+- hosts: test
   gather_facts: false # 不检测系统信息，有利于加快访问
   serial: 5           # 并发执行，即一次可同时执行 5 个节点，可按实现节点数更改
   become: yes

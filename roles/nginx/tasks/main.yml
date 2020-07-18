@@ -1,22 +1,27 @@
 #################### 部署nginx ####################
 - name: 判断 nginx 用户是否存在
   shell: >
-    grep nginx /etc/passwd && echo $?
+    grep nginx /etc/passwd || echo $?
   register: nginx_user_exists
 
 - name: 第一步：创建 nginx 用户
   command: adduser {{ nginx_user }} -s /sbin/nologin
-  when: '"1" in nginx_user_exists.stdout'
+  when: '"already exists" in nginx_user_exists.stdout'
 
-- name: 第二步：复制 nginx 安装
-  synchronize:
+- name: 第二步：复制 nginx 安装包
+  #synchronize:
+  copy:
     src: files/{{ nginx_package }}
     dest: /opt
+    owner: root
+    group: root
+    mode: 0755
 
 - name: 第三步：解压 nginx
   unarchive:
     src: "/opt/{{ nginx_package }}"
-    dest: /opt    
+    dest: /opt
+    remote_src: yes
 
 - name: 第四步：configure nginx
   command: ./configure --user={{ nginx_user }} --group={{ nginx_group }} --prefix={{ nginx_root_dir }} {{ nginx_modules }}
@@ -41,15 +46,18 @@
 #    group: nginx
 
 - name: 第八步：启动 nginx
-  command: "{{ nginx_root_dir }}/sbin/nginx -t"
+  command: "{{ nginx_root_dir }}/sbin/nginx"
 
 - name: 第九步：添加开机启动
   lineinfile:
     path: /etc/rc.d/rc.local
     line:
-      "{{ nginx_root_dir }}/sbin/nginx -t"
+      "{{ nginx_root_dir }}/sbin/nginx"
+
+- name: 第十步：添加开机启动配置文件可执行权限
+  command: chmod +x /etc/rc.d/rc.local
   
-- name: 第十步：添加变量环境
+- name: 第十一步：添加变量环境
   lineinfile:
     path: /etc/profile
     line:
