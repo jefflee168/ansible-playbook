@@ -1,4 +1,5 @@
 roles/jdk/files/*
 roles/nginx/files/*
+roles/redis/sentinel/files/*
 
 update_content.txt

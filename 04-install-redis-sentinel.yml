@@ -1,0 +1,10 @@
+# 部署 redis 哨兵：一主两从
+
+- hosts: redis-sentinel
+  gather_facts: false  # 不检测系统信息，有利于加快访问
+  serial: 3
+  become: yes
+  become_user: root
+
+  roles:
+    - redis/sentinel

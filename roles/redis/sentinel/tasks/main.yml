@@ -1,0 +1,41 @@
+# 部署 redis 哨兵
+- name: 安装 gcc
+  yum:
+    name:
+      - gcc
+
+- name: 复制 redis 压缩包到远程主机上
+  synchronize:
+    src: files/{{ redis_package }}
+    dest: /opt
+
+- name: 解压 redis
+  unarchive:
+    src: /opt/{{ redis_package }}
+    dest: /opt
+    remote_src: yes
+
+- name: 重命名 redis 目录
+  command: mkdir -p {{ redis_root_dir }} && cp -rp {{ redis_dir }}/* {{ redis_root_dir }}/
+  args:
+    chdir: /opt
+
+- name: make redis
+  command: make
+  args:
+    chdir: "{{ redis_root_dir }}"
+
+- name: make install redis
+  command: make install
+  args:
+    chdir: "{{ redis_root_dir }}/src"
+
+- name: 复制 master 配置文件到远程主机上
+  synchronize:
+    src: templates/{{ redis_master_conf }}.j2
+    dest: "{{ redis_root_dir }}/{{ redis_master_conf }}"
+
+- name: 复制 slaver 配置文件到远程主机上
+  synchronize:
+    src: templates/{{ redis_slave_conf }}.j2
+    dest: "{{ redis_root_dir }}/{{ redis_slave_conf }}"

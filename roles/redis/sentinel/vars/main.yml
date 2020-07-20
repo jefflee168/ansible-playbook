@@ -1,0 +1,8 @@
+redis_package: redis-5.0.8.tar.gz
+redis_dir: redis-5.0.8
+redis_root_dir: /opt/redis
+redis_master_conf: redis_master.conf
+redis_slave_conf: redis_slave.conf
+password: 123456
+redis_master: 10.0.0.21
+redis_server_command: /usr/local/bin/redis-server
