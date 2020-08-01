@@ -2,6 +2,6 @@
 new_user: test
 limits_value: 102400
 # Linux 系统路径
-/home/jeff/.ssh/id_rsa.pub
+public_key: /home/jeff/.ssh/id_rsa.pub
 # Mac 系统路径
 #public_key: /Users/jeff/.ssh/id_rsa.pub
