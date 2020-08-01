@@ -1,15 +1,8 @@
 #################### 部署nginx ####################
-- name: 判断 nginx 用户是否存在
-  shell: >
-    grep nginx /etc/passwd
-  register: nginx_user_exists
-
 - name: 创建 nginx 用户
   user:
-    name: nginx
+    name: "{{ nginx_user }}"
     shell: /sbin/nologin
-  # rc 为 return code 的缩写，意思为执行命令“grep nginx /etc/passwd”后，返回代码不等于 0，则创建 nginx 用户
-  when: nginx_user_exists.rc != 0
 
 - name: 复制 nginx 安装包
   synchronize:
