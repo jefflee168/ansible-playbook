@@ -1,3 +1,4 @@
 ---
 new_user: test
 limits_value: 102400
+public_key: /Users/jeff/.ssh/id_rsa.pub

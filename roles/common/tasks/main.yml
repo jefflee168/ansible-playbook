@@ -111,4 +111,4 @@
   authorized_key:
     user: jeff
     state: present
-    key: "{{ lookup('file', '/Users/jeff/.ssh/id_rsa.pub')}}"
+    key: "{{ lookup('file', '{{ public_key }}')}}"
