@@ -1,64 +1,64 @@
 #################### 部署nginx ####################
 - name: 判断 nginx 用户是否存在
   shell: >
-    grep nginx /etc/passwd || echo $?
+    grep nginx /etc/passwd
   register: nginx_user_exists
 
-- name: 第一步：创建 nginx 用户
-  command: adduser {{ nginx_user }} -s /sbin/nologin
-  when: '"already exists" in nginx_user_exists.stdout'
+- name: 创建 nginx 用户
+  user:
+    name: nginx
+    shell: /sbin/nologin
+  # rc 为 return code 的缩写，意思为执行命令“grep nginx /etc/passwd”后，返回代码不等于 0，则创建 nginx 用户
+  when: nginx_user_exists.rc != 0
 
-- name: 第二步：复制 nginx 安装包
-  #synchronize:
-  copy:
-    src: files/{{ nginx_package }}
+- name: 复制 nginx 安装包
+  synchronize:
+    src: "files/{{ nginx_package }}.tar.gz"
     dest: /opt
-    owner: root
-    group: root
-    mode: 0755
 
-- name: 第三步：解压 nginx
+- name: 解压 nginx 压缩包
   unarchive:
-    src: "/opt/{{ nginx_package }}"
+    src: "/opt/{{ nginx_package }}.tar.gz"
     dest: /opt
     remote_src: yes
 
-- name: 第四步：configure nginx
+- name: Configure nginx
   command: ./configure --user={{ nginx_user }} --group={{ nginx_group }} --prefix={{ nginx_root_dir }} {{ nginx_modules }}
   args:
-    chdir: /opt/{{ nginx_dir }}
+    chdir: /opt/{{ nginx_package }}
 
-- name: 第五步：make nginx
+- name: Make nginx
   make:
-    chdir: /opt/{{ nginx_dir }}
+    chdir: /opt/{{ nginx_package }}
 
-- name: 第六步：make install nginx
+- name: Make install nginx
   make:
     target: install
-    chdir: /opt/{{ nginx_dir }}
+    chdir: /opt/{{ nginx_package }}
 
-#- name: 第七步：复制配置文件
+#- name: 复制配置文件
 #  synchronize:
 #    src: templates/nginx.conf.j2
 #    dest: {{ nginx_root_dir }}/conf/nginx.conf
 #    owner: nginx
 #    group: nginx
 
-- name: 第八步：启动 nginx
+- name: Start nginx
   command: "{{ nginx_root_dir }}/sbin/nginx"
 
-- name: 第九步：添加开机启动
+- name: 添加开机启动，并赋予文件 /etc/rc.d/rc.local 可执行权限
   lineinfile:
     path: /etc/rc.d/rc.local
+    regexp: "^{{ nginx_root_dir }}"
     line:
       "{{ nginx_root_dir }}/sbin/nginx"
-
-- name: 第十步：添加开机启动配置文件可执行权限
-  command: chmod +x /etc/rc.d/rc.local
+    mode: 0644
   
-- name: 第十一步：添加变量环境
+- name: 添加 nginx 的变量环境
   lineinfile:
     path: /etc/profile
-    line:
-      export NGINX_HOME={{ nginx_root_dir }}
-      export PATH=${NGINX_HOME}/sbin:$PATH
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: "^export NGINX_HOME=", line: "export NGINX_HOME={{ nginx_root_dir }}" }
+    - { regexp: "^export PATH=${NGINX_HOME}", line: "export PATH=${NGINX_HOME}/sbin:$PATH" }
