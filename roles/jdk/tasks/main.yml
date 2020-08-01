@@ -16,7 +16,8 @@
 - name: 第三步：添加变量环境
   lineinfile:
     path: /etc/profile
-    line:
-      export JAVA_HOME={{ dest_dir }}/jdk
-      export PATH=${JAVA_HOME}/bin:$PATH
-################### End 配置java环境 ####################
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^export JAVA_HOME=' , line: 'export JAVA_HOME={{ dest_dir }}/jdk' }
+    - { regexp: '^export PATH=${JAVA_HOME}', line: 'export PATH=${JAVA_HOME}/bin:$PATH' }

@@ -29,13 +29,12 @@
     chdir: /opt/{{ nginx_dir }}
 
 - name: 第五步：make nginx
-  command: make
-  args:
+  make:
     chdir: /opt/{{ nginx_dir }}
 
 - name: 第六步：make install nginx
-  command: make install
-  args:
+  make:
+    target: install
     chdir: /opt/{{ nginx_dir }}
 
 #- name: 第七步：复制配置文件
