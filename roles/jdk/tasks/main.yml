@@ -28,5 +28,5 @@
     - { regexp: '^export JAVA_HOME=' , line: 'export JAVA_HOME={{ dest_dir }}/jdk' }
     - { regexp: '^export PATH=${JAVA_HOME}', line: 'export PATH=${JAVA_HOME}/bin:$PATH' }
 
-- name: 使刚添加的 java 变量环境立刻生效
-  shell: source /etc/profile
+#- name: 使刚添加的 java 变量环境立刻生效
+#  shell: source /etc/profile
