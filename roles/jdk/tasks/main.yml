@@ -1,17 +1,23 @@
 #################### 配置java环境 ####################
 - name: 第一步：同步 jdk
   synchronize: 
-    src: "files/{{ jdk_root_dir }}"
+    src: "files/{{ jdk_package }}"
     dest: "{{ dest_dir }}"
+
+- name: 解压 jdk 压缩包
+  unarchive:
+    src: "{{ dest_dir }}/{{ jdk_package }}"
+    dest: "{{ dest_dir }}"
+    remote_src: yes  # 指定 src 为远程服务器的目录
+    mode: 0755 # 权限设置为 755，否则执行不了
+    owner: root
+    group: root
 
 - name: 第二步：创建 jdk 的软链接
   file:
     path: "{{ dest_dir }}/jdk"
     state: link
-    src: "{{ dest_dir }}/{{ jdk_root_dir }}"
-    mode: 0755
-    owner: root
-    group: root
+    src: "{{ jdk_root_dir }}"
 
 - name: 第三步：添加变量环境
   lineinfile:
