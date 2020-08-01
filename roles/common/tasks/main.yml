@@ -112,3 +112,7 @@
     user: jeff
     state: present
     key: "{{ lookup('file', '{{ public_key }}')}}"
+
+- name: 设置时区为 Asia/Shanghai
+  timezone:
+    name: Asia/Shanghai

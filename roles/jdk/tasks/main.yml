@@ -1,5 +1,5 @@
 #################### 配置java环境 ####################
-- name: 第一步：同步 jdk
+- name: 复制 jdk 压缩包到远程主机
   synchronize: 
     src: "files/{{ jdk_package }}"
     dest: "{{ dest_dir }}"
@@ -13,13 +13,13 @@
     owner: root
     group: root
 
-- name: 第二步：创建 jdk 的软链接
+- name: 创建 jdk 的软链接
   file:
     path: "{{ dest_dir }}/jdk"
     state: link
     src: "{{ jdk_root_dir }}"
 
-- name: 第三步：添加变量环境
+- name: 添加 java 的变量环境
   lineinfile:
     path: /etc/profile
     regexp: "{{ item.regexp }}"
@@ -27,3 +27,6 @@
   with_items:
     - { regexp: '^export JAVA_HOME=' , line: 'export JAVA_HOME={{ dest_dir }}/jdk' }
     - { regexp: '^export PATH=${JAVA_HOME}', line: 'export PATH=${JAVA_HOME}/bin:$PATH' }
+
+- name: 使刚添加的 java 变量环境立刻生效
+  shell: source /etc/profile
