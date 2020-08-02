@@ -1,0 +1,3 @@
+- name: 按判断条件输出
+  command: cat /etc/redhat-release
+  when: ansible_facts['distribution'] == "CentOS"

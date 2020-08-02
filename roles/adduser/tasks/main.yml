@@ -1,0 +1,32 @@
+- name: 添加一个用户
+  user:
+    name: "{{ new_user }}"
+
+- name: 创建一个 4096-bit SSH key for user {{ new_user }}
+  user:
+    name: "{{ new_user }}"
+    generate_ssh_key: yes
+    ssh_key_bits: 4096
+    ssh_key_file: .ssh/id_rsa
+
+- name: 确保 wheel 不在配置文件 /etc/sudoers 配置文件中
+  lineinfile:
+    path: /etc/sudoers
+    state: absent
+    regexp: '^%wheel'
+
+- name: 为用户 {{ new_user }} 添加 sudo 权限
+  lineinfile:
+    path: /etc/sudoers
+    validate: /usr/sbin/visudo -cf %s
+    regexp: "{{ item.regexp }}"  # 添加此正则，就能确保即可执行多次此脚本，sudoers 里也不会要重复的行
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^{{ new_user }} ALL=', line: '{{ new_user }} ALL=(ALL) NOPASSWD: ALL'}
+    - { regexp: '^%{{ new_user }} ALL=', line: '%{{ new_user }} ALL=(ALL) NOPASSWD: ALL'}
+
+- name: 上传当前用户 jeff 的 key 到远程服务器上
+  authorized_key:
+    user: jeff
+    state: present
+    key: "{{ lookup('file', '{{ public_key }}')}}"

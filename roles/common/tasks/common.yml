@@ -1,0 +1,42 @@
+- name: 设置时区为 Asia/Shanghai
+  timezone:
+    name: Asia/Shanghai
+
+- name: 优化系统连接数 - 类型 soft，item 为 nofile
+  pam_limits:
+    domain: '*'
+    limit_type: soft
+    limit_item: nofile
+    value: "{{ limits_value }}"
+    #use_max: yes  # 如果存在配置，则使用最大的配置参数，如存在 1024000，则使用 1024000，65535 不会生效
+
+- name: 优化系统连接数 - 类型 soft，item 为 nproc
+  pam_limits:
+    domain: '*'
+    limit_type: soft
+    limit_item: nproc
+    value:  "{{ limits_value }}"
+
+- name: 优化系统连接数 - 类型 hard，item 为 nofile
+  pam_limits:
+    domain: '*'
+    limit_type: hard
+    limit_item: nofile
+    value:  "{{ limits_value }}"
+
+- name: 优化系统连接数 - 类型 hard，item 为 nproc
+  pam_limits:
+    domain: '*'
+    limit_type: hard
+    limit_item: nproc
+    value:  "{{ limits_value }}"
+
+- name: 开启 IP 转发功能
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_file: /etc/sysctl.conf
+    sysctl_set: yes
+    state: present
+    reload: yes
+    

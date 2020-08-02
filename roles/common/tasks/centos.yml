@@ -1,0 +1,55 @@
+- block:
+  - name: 备份原有 yum 源
+    raw: mv /etc/yum.repos.d /etc/yum.repos.d.orig.$(date '+%Y%m%dT%H%M%S')
+
+  - name: 创建相关目录
+    file:
+      path: /etc/yum.repos.d
+      state: directory
+
+  - name: 更换基础 yum 仓库为阿里源
+    get_url:
+      url: "{{ base_yum_repo }}"
+      dest: /etc/yum.repos.d/CentOS-Base.repo
+
+- name: 添加 epel 仓库
+  yum_repository:
+    name: epel
+    description: EPEL Repository
+    baseurl: "{{ epel_yum_repo }}"
+    enabled: yes
+    gpgcheck: no
+    state: present
+
+- name: 刷新 yum 缓存
+  shell: yum clean all && yum makecache fast
+
+- name: 关闭 selinux，包括临时关闭 selinx
+  selinux: 
+    policy: targeted
+    state: disabled
+
+- name: 关闭防火墙
+  service: 
+    name: firewalld 
+    enabled: no
+    state: stopped  
+
+- name: 安装常用的工具
+  yum:
+    name:
+    - gcc
+    - pcre
+    - pcre-devel
+    - openssl
+    - openssl-devel
+    - iftop
+    - zip
+    - unzip
+    - gzip
+    - sysstat
+    - iotop
+    - net-tools
+    - telnet
+    - wget
+    - rsync

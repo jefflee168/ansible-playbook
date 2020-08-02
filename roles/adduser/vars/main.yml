@@ -1,0 +1,10 @@
+# 此文件用于定义全局变量
+---
+# 定义新用户为 test
+new_user: test
+
+# SSH Key Linux 系统路径
+public_key: /home/jeff/.ssh/id_rsa.pub
+
+# SSH Key Mac 系统路径
+#public_key: /Users/jeff/.ssh/id_rsa.pub

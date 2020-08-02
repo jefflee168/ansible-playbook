@@ -1,13 +1,15 @@
 #################### 部署nginx ####################
-- name: 安装 epel-release
-  yum:
-    name:
-    - epel-release
+- name: 添加 epel 仓库
+  yum_repository:
+    name: epel
+    description: EPEL Repository
+    baseurl: "{{ epel_yum_repo }}"
+    enabled: yes
+    gpgcheck: no
+    state: present
 
-- name: 更换 epel-release 为阿里源
-  get_url:
-    url: http://mirrors.aliyun.com/repo/epel-7.repo
-    dest: /etc/yum.repos.d/epel.repo
+- name: 刷新 yum 缓存
+  shell: yum clean all && yum makecache fast
 
 - name: 安装依赖包
   yum:

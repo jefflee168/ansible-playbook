@@ -1,7 +1,9 @@
 ---
-new_user: test
+# 设置文件最大连接数
 limits_value: 102400
-# Linux 系统路径
-public_key: /home/jeff/.ssh/id_rsa.pub
-# Mac 系统路径
-#public_key: /Users/jeff/.ssh/id_rsa.pub
+
+# base 阿里云仓库
+base_yum_repo: http://mirrors.aliyun.com/repo/Centos-7.repo
+
+# epel 阿里源
+epel_yum_repo: http://mirrors.aliyun.com/epel/7/$basearch

@@ -1,118 +1,14 @@
-- name: 安装 epel-release
-  yum:
-    name:
-    - epel-release
+# 公共系统参数设置
+- include_tasks: common.yml
 
-- name: 更换 epel-release 为阿里源
-  get_url:
-    url: http://mirrors.aliyun.com/repo/epel-7.repo
-    dest: /etc/yum.repos.d/epel.repo
+# 系统基础环境环境
+- include_tasks: centos.yml
+  when: ansible_distribution in [ 'CentOS', 'OracleLinux', 'RedHat']
 
-- name: 关闭 selinux，包括临时关闭 selinx
-  selinux: 
-    policy: targeted
-    state: disabled
+- include_tasks: debian.yml
+  when: ansible_distribution in [ 'Ubuntu', 'Debian']
 
-- name: 关闭防火墙
-  service: 
-    name: firewalld 
-    enabled: no
-    state: stopped
 
-- name: 优化系统连接数 - 类型 soft，item 为 nofile
-  pam_limits:
-    domain: '*'
-    limit_type: soft
-    limit_item: nofile
-    value: "{{ limits_value }}"
-    #use_max: yes  # 如果存在配置，则使用最大的配置参数，如存在 1024000，则使用 1024000，65535 不会生效
 
-- name: 优化系统连接数 - 类型 soft，item 为 nproc
-  pam_limits:
-    domain: '*'
-    limit_type: soft
-    limit_item: nproc
-    value:  "{{ limits_value }}"
 
-- name: 优化系统连接数 - 类型 hard，item 为 nofile
-  pam_limits:
-    domain: '*'
-    limit_type: hard
-    limit_item: nofile
-    value:  "{{ limits_value }}"
 
-- name: 优化系统连接数 - 类型 hard，item 为 nproc
-  pam_limits:
-    domain: '*'
-    limit_type: hard
-    limit_item: nproc
-    value:  "{{ limits_value }}"
-
-- name: 开启 IP 转发功能
-  sysctl:
-    name: net.ipv4.ip_forward
-    value: '1'
-    sysctl_file: /etc/sysctl.conf
-    sysctl_set: yes
-    state: present
-    reload: yes
-
-- name: 修改主机名称
-  hostname:
-    name: server0
-
-- name: 安装常用的工具
-  yum:
-    name:
-    - gcc
-    - pcre
-    - pcre-devel
-    - openssl
-    - openssl-devel
-    - iftop
-    - zip
-    - unzip
-    - gzip
-    - sysstat
-    - iotop
-    - net-tools
-    - telnet
-    - wget
-    - rsync
-
-- name: 添加一个用户 ‘test’
-  user:
-    name: "{{ new_user }}"
-
-- name: 创建一个 4096-bit SSH key for user {{ new_user }}
-  user:
-    name: "{{ new_user }}"
-    generate_ssh_key: yes
-    ssh_key_bits: 4096
-    ssh_key_file: .ssh/id_rsa
-
-- name: 确保 wheel 不在配置文件 /etc/sudoers 配置文件中
-  lineinfile:
-    path: /etc/sudoers
-    state: absent
-    regexp: '^%wheel'
-
-- name: 为用户 {{ new_user }} 添加 sudo 权限
-  lineinfile:
-    path: /etc/sudoers
-    validate: /usr/sbin/visudo -cf %s
-    regexp: "{{ item.regexp }}"  # 添加此正则，就能确保即可执行多次此脚本，sudoers 里也不会要重复的行
-    line: "{{ item.line }}"
-  with_items:
-    - { regexp: '^{{ new_user }} ALL=', line: '{{ new_user }} ALL=(ALL) NOPASSWD: ALL'}
-    - { regexp: '^%{{ new_user }} ALL=', line: '%{{ new_user }} ALL=(ALL) NOPASSWD: ALL'}
-
-- name: 上传当前用户 jeff 的 key 到远程服务器上
-  authorized_key:
-    user: jeff
-    state: present
-    key: "{{ lookup('file', '{{ public_key }}')}}"
-
-- name: 设置时区为 Asia/Shanghai
-  timezone:
-    name: Asia/Shanghai
