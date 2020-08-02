@@ -8,5 +8,4 @@
   become_user: root   # 提权为 root 用户
 
   roles:
-  #- common
   - nginx

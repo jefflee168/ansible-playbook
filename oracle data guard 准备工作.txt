@@ -1,0 +1,82 @@
+oracle data guard 准备工作
+
+1、确认 primary 库处于 Logging 模式
+
+SQL> archive log list;
+Database log mode              Archive Mode
+Automatic archival             Enabled
+Archive destination            USE_DB_RECOVERY_FILE_DEST
+Oldest online log sequence     12852
+Next log sequence to archive   12855
+Current log sequence           12855
+
+
+2. 确认从库也是归档模式
+
+SQL> archive log list;
+Database log mode              Archive Mode
+Automatic archival             Enabled
+Archive destination            USE_DB_RECOVERY_FILE_DEST
+Oldest online log sequence     0
+Next log sequence to archive   0
+Current log sequence           0
+
+# 从上以反馈结果的后 3 项归档信息为0，说明 primary 上的 redo 日志没有传到 standby 上来
+
+
+3、问题排查
+
+3.1 查看 alert 日志
+
+
+
+4、验证主从是否同步
+
+# 在主库上执行
+SQL> select max(sequence#) from v$archived_log;
+
+MAX(SEQUENCE#)
+--------------
+         12855
+
+# 在从库上执行
+SQL> select max(sequence#) from v$archived_log;
+
+MAX(SEQUENCE#)
+--------------
+         12855
+
+# 在主从两个库上执行 - 结果是一致的
+SQL> select sequence#,applied from v$archived_log;
+......
+SEQUENCE# APPLIED
+---------- ---------
+     12850 YES
+     12851 YES
+     12852 YES
+     12853 YES
+     12854 YES
+     12855 IN-MEMORY
+
+2800 rows selected.
+
+
+结果证明：primary 和 standby 都保持一致！
+
+
+
+
+参考文献：http://www.zhangqiongjie.com/1954.html
+
+
+
+
+
+
+
+
+
+
+
+
+参考文献：http://blog.itpub.net/31500837/viewspace-2146643/

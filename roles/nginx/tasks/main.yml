@@ -1,4 +1,27 @@
 #################### 部署nginx ####################
+- name: 安装 epel-release
+  yum:
+    name:
+    - epel-release
+
+- name: 更换 epel-release 为阿里源
+  get_url:
+    url: http://mirrors.aliyun.com/repo/epel-7.repo
+    dest: /etc/yum.repos.d/epel.repo
+
+- name: 安装依赖包
+  yum:
+    name:
+    - pcre
+    - pcre-devel
+    - openssl
+    - openssl-devel
+    - gcc
+    - tar
+    - curl
+    - wget
+    - rsync
+
 - name: 创建 nginx 用户
   user:
     name: "{{ nginx_user }}"
@@ -37,7 +60,7 @@
 #    group: nginx
 
 - name: Start nginx
-  command: "{{ nginx_root_dir }}/sbin/nginx"
+  shell: "{{ nginx_root_dir }}/sbin/nginx"
 
 - name: 添加开机启动，并赋予文件 /etc/rc.d/rc.local 可执行权限
   lineinfile:
