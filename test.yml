@@ -1,0 +1,23 @@
+---
+- hosts: testing
+  gather_facts: no
+  serial: 2
+  become: yes
+  become_user: root
+
+  tasks:
+    - name: 校验节点资源配置
+      include: verify_node.yml
+      when: not ( skip_verify_node | bool )
+
+    - name: Install iftop
+      yum:
+        name:
+        - iftop
+      when: ansible_distribution in [ 'CentOS','OracleLinux','RedHat' ]
+
+    - name: Install iftop
+      apt:
+        name:
+        - iftop
+      when: ansible_distribution in [ 'Ubuntu','Debian' ]
