@@ -1,0 +1,43 @@
+- name: 首先要安装 rsync 工具，否则不能使用 synchronize 模块
+  yum:
+    name:
+    - rsync
+
+- name: 复制 zabbix_agent 安装包到远程目录 /opt 下
+  synchronize:
+    src: "files/{{ zabbix_agent_package }}"
+    dest: /opt
+
+- name: 解压 zabbix_agent 安装包
+  unarchive:
+    src: "/opt/{{ zabbix_agent_package }}"
+    dest: /opt
+    remote_src: yes
+
+- name: 修改 zabbix_agent.conf 配置文件
+  lineinfile:
+    path: "{{ zabbix_agent_conf }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: "^Server=", line: "Server={{ zabbix_server }}"}
+    - { regexp: "^ServerActive=", line: "ServerActive={{ zabbix_server }}" }
+
+- name: 创建 zabbix user
+  user:
+    name: "{{ zabbix_user }}"
+    shell: /sbin/nologin
+
+- name: 创建日志文件 zabbix_agentd.log, 否则启动不成功
+  file:
+    path: "{{ zabbix_agent_log }}"
+    state: touch
+    mode: 664
+
+- name: 启动 zabbix_agent
+  shell: "{{ zabbix_agentd_cmd }} -c {{ zabbix_agent_conf }}"
+
+- name: zabbix_agent 加到开机启动
+  lineinfile:
+    path: /etc/rc.d/rc.local
+    line: "{{ zabbix_agentd_cmd }} -c {{ zabbix_agent_conf }}"

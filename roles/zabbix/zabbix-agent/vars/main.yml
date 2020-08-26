@@ -1,0 +1,7 @@
+---
+zabbix_server: 10.0.0.21
+zabbix_agent_package: zabbix3.tar.gz
+zabbix_agent_conf: /opt/zabbix3/conf/zabbix_agentd.conf
+zabbix_agentd_cmd: /opt/zabbix3/sbin/zabbix_agentd
+zabbix_user: zabbix
+zabbix_agent_log: /opt/zabbix3/zabbix_agentd.log
